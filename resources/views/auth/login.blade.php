@@ -12,12 +12,14 @@
                         @csrf
 
                         <div class="row mb-3">
-                            <label for="email" class="col-md-4 col-form-label text-md-end">{{ __('Email Address') }}</label>
+                            <label for="email" class="col-md-4 col-form-label text-md-end">{{ __('login code') }}</label>
 
                             <div class="col-md-6">
-                                <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
-
-                                @error('email')
+                                <input id="login_code" type="text" class="form-control @error('login_code') is-invalid @enderror" name="login_code" value="{{ old('login_code') }}" required autocomplete="login_code" autofocus>
+                                @if(Session::has('error'))
+                                    <p class="alert-danger">{{ Session::get('error') }}</p>
+                                @endif
+                                @error('login_code')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>

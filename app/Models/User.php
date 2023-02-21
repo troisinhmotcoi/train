@@ -18,7 +18,9 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $table = 'user_mst';
-
+    protected $primaryKey = 'user_id';
+    public $incrementing = false;
+    public $timestamps = false;
     protected $guarded = [
 
     ];
@@ -41,4 +43,8 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+//    public function tokenable()
+//    {
+//        return $this->morphOne('app/Models/PersonalAccessToken', 'tokenable');
+//    }
 }

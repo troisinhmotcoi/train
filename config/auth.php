@@ -14,7 +14,7 @@ return [
     */
 
     'defaults' => [
-        'guard' => 'api',
+        'guard' => 'web',
         'passwords' => 'users',
     ],
 
@@ -36,8 +36,12 @@ return [
     */
 
     'guards' => [
+        'web' => [
+            'driver' => 'session',
+            'provider' => 'users',
+        ],
         'api' => [
-            'driver' => 'token',
+            'driver' => 'api',
             'provider' => 'users',
             'hash' => false,
         ],
@@ -66,10 +70,10 @@ return [
             'model' => App\Models\User::class,
         ],
 
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+         'api' => [
+             'driver' => 'database',
+             'table' => 'personal_access_tokens',
+         ],
     ],
 
     /*

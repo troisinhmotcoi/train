@@ -8,6 +8,8 @@ use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Session;
 
 class LoginController extends Controller
 {
@@ -46,20 +48,40 @@ class LoginController extends Controller
         return view('auth.login');
     }
 
-    public function login(LoginRequest $request)
+    public function login(LoginRequest  $request)
     {
         $credentials = $request->getCredentials();
-        dd(Auth::validate($credentials));
-        if(!Auth::validate($credentials)):
-            return redirect()->to('login')
-                ->withErrors(trans('auth.failed'));
-        endif;
 
-        $user = Auth::getProvider()->retrieveByCredentials($credentials);
+        $authenticated = Auth::attempt($credentials);
 
-        Auth::login($user);
+        if ($authenticated) {
+            $user = Auth::getProvider()->retrieveByCredentials($credentials);
 
-        return $this->authenticated($request, $user);
+            $this->authenticated($request, $user);
+        }
+        Session::flash('error', 'The login information is incorrect');
+
+
+        return redirect()->route('login');
+    }
+    public function get_token(LoginRequest  $request)
+    {
+        $credentials = $request->getCredentials();
+
+        $authenticated = Auth::attempt($credentials);
+
+        if ($authenticated) {
+            $user = Auth::getProvider()->retrieveByCredentials($credentials);
+
+            $token = $user->createToken($request->login_code)->plainTextToken;
+            return response()->json(
+                [
+                    'access_token' => $token
+                ],200
+            );
+        }
+
+
     }
     /**
      * Handle response after user authenticated

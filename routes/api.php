@@ -1,6 +1,8 @@
 <?php
 
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,8 +22,13 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('smoothfile')
     ->namespace('App\Http\Controllers\Api')
-    ->middleware('auth:sanctum')
+    ->middleware('auth:api')
     ->group(function () {
-        Route::post('index', 'UserController@index');
+        Route::get('/user', 'UserController@index');
+    });
+Route::prefix('smoothfile')
+     ->namespace('App\Http\Controllers\Auth')
+    ->group(function () {
 
+        Route::post('/sanctum/token', 'LoginController@get_token');
     });

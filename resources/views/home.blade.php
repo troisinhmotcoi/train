@@ -18,6 +18,13 @@
                 </div>
             </div>
         </div>
+        <div class="col-md-8 scrollmenu">
+            <a href="/api/smoothfile/user/">List</a>
+            <a href="#news">News</a>
+            <a href="#contact">Contact</a>
+            <a href="#about">About</a>
+            ...
+        </div>
     </div>
 </div>
 @endsection
