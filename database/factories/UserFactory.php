@@ -18,7 +18,7 @@ class UserFactory extends Factory
     public function definition()
     {
         return [
-            'user_name' => fake()->name(),
+           'user_name' => fake()->name(),
             'user_mail' => fake()->unique()->safeEmail(),
             'regist_date' => now(),
             'password' => bcrypt('plottcpn'), // password

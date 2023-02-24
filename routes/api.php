@@ -22,9 +22,15 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('smoothfile')
     ->namespace('App\Http\Controllers\Api')
-    ->middleware('auth:api')
+    ->middleware('auth:sanctum')
     ->group(function () {
-        Route::get('/user', 'UserController@index');
+        Route::post('/user', 'UserController@index');
+        Route::post('/user-create', 'UserController@create');
+        Route::post('/user-update', 'UserController@update');
+        Route::post('/user-delete', 'UserController@delete');
+        Route::post('/user-search', 'UserController@search');
+
+
     });
 Route::prefix('smoothfile')
      ->namespace('App\Http\Controllers\Auth')
