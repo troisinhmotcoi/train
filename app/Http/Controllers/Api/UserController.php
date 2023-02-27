@@ -78,27 +78,27 @@ class UserController extends Controller
 
     public function search(Request $request)
     {
-        $aData = $request->only('search[master][user_regist_date][start_eq]','search[master][user_regist_date][end_eq]','search[freeword]','search[master][company_id]',
-        'search[master][auth_group_id]','search[master][user_lock_flag]');
-        $q=$this->user;
+        $aData = $request->only('search[master][user_regist_date][start_eq]', 'search[master][user_regist_date][end_eq]', 'search[freeword]', 'search[master][company_id]',
+            'search[master][auth_group_id]', 'search[master][user_lock_flag]');
+        $q = $this->user;
 
-        $aData = ['start_eq'=>$request->search['master']['user_regist_date']['start_eq'],
-        'end_eq'=>$request->search['master']['user_regist_date']['end_eq'] ?? '',
-        'auth_group_id'=>$request->search['master']['auth_group_id'] ?? '',
-        'user_lock_flag'=>$request->search['master']['user_lock_flag'] ?? ''
-    ];
+        $aData = ['start_eq' => $request->search['master']['user_regist_date']['start_eq'],
+            'end_eq' => $request->search['master']['user_regist_date']['end_eq'] ?? '',
+            'auth_group_id' => $request->search['master']['auth_group_id'] ?? '',
+            'user_lock_flag' => $request->search['master']['user_lock_flag'] ?? ''
+        ];
 
-        foreach($aData as $k=>$v){
-            switch ($k){
+        foreach ($aData as $k => $v) {
+            switch ($k) {
                 case ('start_eq'):
-                    $q= $q->where('user_regist_date','>',$v);
+                    $q = $q->where('user_regist_date', '>', $v);
                 case ('end_eq'):
-                    $q=$q->where('user_regist_date','<',$v);
+                    $q = $q->where('user_regist_date', '<', $v);
                 default:
-                    $q= $q->where($k,$v);
+                    $q = $q->where($k, $v);
             }
         }
-         return ['data'=>$q->get(),'count'=>count($q->get())];
+        return ['data' => $q->get(), 'count' => count($q->get())];
 
     }
 
