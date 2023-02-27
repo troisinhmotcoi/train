@@ -3,12 +3,18 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Requests\UserRequest;
+use Carbon\Carbon;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller as Controller;
 use App\Models\User;
+
+//use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class UserController extends Controller
 {
@@ -100,6 +106,17 @@ class UserController extends Controller
         }
         return ['data' => $q->get(), 'count' => count($q->get())];
 
+    }
+
+    public function libSearch(Request $request)
+    {
+
+        $users = QueryBuilder::for(User::class)
+            ->allowedFilters([AllowedFilter::scope('start_eq'), AllowedFilter::scope('end_eq'), 'login_code'
+            ])
+            ->allowedSorts(['user_regist_date', 'login_code'])
+            ->get();
+        return $users;
     }
 
     public function delete(Request $request)

@@ -28,7 +28,7 @@ Route::prefix('smoothfile')
         Route::post('/user-create', 'UserController@create');
         Route::post('/user-update', 'UserController@update');
         Route::post('/user-delete', 'UserController@delete');
-        Route::post('/user-search', 'UserController@search');
+        Route::post('/user-search', 'UserController@libSearch');
 
 
     });
