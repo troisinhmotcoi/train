@@ -29,11 +29,12 @@ Route::prefix('smoothfile')
         Route::post('/user-update', 'UserController@update');
         Route::post('/user-delete', 'UserController@delete');
         Route::post('/user-search', 'UserController@libSearch');
-
+        Route::get('/files/export/', 'FileController@export');
+        Route::post('/files/export/detail', 'FileController@exportDetailExcel');
 
     });
 Route::prefix('smoothfile')
-     ->namespace('App\Http\Controllers\Auth')
+    ->namespace('App\Http\Controllers\Auth')
     ->group(function () {
 
         Route::post('/sanctum/token', 'LoginController@get_token');

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Requests\UserRequest;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller as Controller;
@@ -34,25 +35,36 @@ class UserController extends Controller
         switch ($t) {
             case ('all'):
                 $all = $this->user->all();
-
+                break;
             default:
                 $all = DB::table('user_mst')
                     ->join('company_mst', function (JoinClause $join) use ($t) {
                         $join->on('user_mst.company_id', '=', 'company_mst.company_id')
                             ->where('company_mst.company_type', '=', intval($t));
                     })->get();
-                return $all;
+
         }
+        return $all;
+
     }
 
     public function update(Request $request)
     {
+        try {
+            $user = $this->user->findOrFail($request->user_id);
+            $user_name = $request->user_name;
+            $user_kana = $request->user_kana;
+            $password = bcrypt($request->password);
+            $user = $user->update(['user_name' => $user_name, 'user_kana' => $user_kana, 'password' => $password]);
+            return response()->json([
+                'data' => $user,
+                'status' => '200'
 
-        $user = $this->user->find($request->user_id);
-        $user_name = $request->user_name;
-        $user_kana = $request->user_kana;
-        $password = bcrypt($request->password);
-        $user->update(['user_name' => $user_name, 'user_kana' => $user_kana, 'password' => $password]);
+            ]);
+        } catch (ModelNotFoundException $e) {
+            return ($e->getMessage());
+        }
+
     }
 
     public function create(UserRequest $request)
@@ -121,6 +133,12 @@ class UserController extends Controller
 
     public function delete(Request $request)
     {
-        $this->user->find($request->user_id)->delete();
+        try {
+            $user = User::findOrFail($request->user_id);
+            $user->delete();
+        } // catch(Exception $e) catch any exception
+        catch (ModelNotFoundException $e) {
+            return ($e->getMessage());
+        }
     }
 }
