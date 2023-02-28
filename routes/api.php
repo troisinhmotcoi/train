@@ -31,6 +31,8 @@ Route::prefix('smoothfile')
         Route::post('/user-search', 'UserController@libSearch');
         Route::get('/files/export/', 'FileController@export');
         Route::post('/files/export/detail', 'FileController@exportDetailExcel');
+        Route::post('/user/change-lock', 'UserController@changeLock');
+
 
     });
 Route::prefix('smoothfile')

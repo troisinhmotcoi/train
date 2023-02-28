@@ -48,6 +48,23 @@ class UserController extends Controller
 
     }
 
+    public function changeLock(Request $request)
+    {
+        try {
+            $user = $this->user->findOrFail($request->user_id);
+            $value = $request->value;
+            $user = $user->update(['user_lock_flag' => $value]);
+            $user = $this->user->findOrFail($request->user_id);
+            return response()->json([
+                'data' => $user,
+                'status' => '200'
+
+            ]);
+        } catch (ModelNotFoundException $e) {
+            return ($e->getMessage());
+        }
+    }
+
     public function update(Request $request)
     {
         try {
