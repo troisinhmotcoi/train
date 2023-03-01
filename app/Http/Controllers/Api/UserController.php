@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Requests\UserRequest;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Http\Request;
@@ -12,7 +11,6 @@ use App\Models\User;
 
 //use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -158,4 +156,30 @@ class UserController extends Controller
             return ($e->getMessage());
         }
     }
+
+    public function changePassword(Request $request)
+    {
+
+        try {
+            $user = $this->user->findOrFail($request->user_id);
+            $check = password_verify($request->current_pw, $user->password);
+            if ($check) {
+                $password = bcrypt($request->expect_pw);
+                $user = $user->update(['password' => $password]);
+                if ($user)
+                    return response()->json([
+                        'data' => $user,
+                        'status' => '200'
+
+                    ]);
+            }
+
+        } catch (ModelNotFoundException $e) {
+            return ($e->getMessage());
+        }
+
+
+    }
+
+
 }

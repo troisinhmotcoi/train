@@ -29,11 +29,16 @@ Route::prefix('smoothfile')
         Route::post('/user-update', 'UserController@update');
         Route::post('/user-delete', 'UserController@delete');
         Route::post('/user-search', 'UserController@libSearch');
+
         Route::get('/files/export/', 'FileController@export');
         Route::post('/files/import/', 'FileController@import');
-
         Route::post('/files/export/detail', 'FileController@exportDetailExcel');
+
+        Route::post('/option/password', 'UserController@changePassword');
+
         Route::post('/user/change-lock', 'UserController@changeLock');
+
+        Route::post('/address/update', 'AddressController@edit');
 
 
     });

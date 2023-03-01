@@ -48,7 +48,7 @@ class LoginController extends Controller
         return view('auth.login');
     }
 
-    public function login(LoginRequest  $request)
+    public function login(LoginRequest $request)
     {
         $credentials = $request->getCredentials();
 
@@ -64,7 +64,8 @@ class LoginController extends Controller
 
         return redirect()->route('login');
     }
-    public function get_token(LoginRequest  $request)
+
+    public function get_token(LoginRequest $request)
     {
         $credentials = $request->getCredentials();
 
@@ -77,12 +78,14 @@ class LoginController extends Controller
             return response()->json(
                 [
                     'access_token' => $token
-                ],200
+                ], 200
             );
-        }
+        } else
+            return 'not authenticated';
 
 
     }
+
     /**
      * Handle response after user authenticated
      *
