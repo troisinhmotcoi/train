@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Exports\FileExport;
 use App\Http\Controllers\Controller;
+use App\Imports\FileImport;
 use App\Models\User;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -19,9 +21,22 @@ class FileController extends Controller
     public function exportDetailExcel(Request $request)
     {
         $user = User::findOrFail($request->user_id);
-        $file = Excel::download(new FileExport($user->user_id), $user->login_code.'.xlsx');
-        return $file;
-        return Excel::store(new FileExport($user->user_id), $user->login_code.'.xlsx', 'disk-name'); //lưu file export trên ổ cứng
+        return Excel::download(new FileExport($user->user_id), $user->login_code . '.xlsx');
+        return Excel::store(new FileExport($user->user_id), $user->login_code . '.xlsx', 'disk-name'); //lưu file export trên ổ cứng
 
     }
+
+    public function import()
+    {
+        try {
+            Excel::import(new FileImport, request()->file('data'));
+            return [
+                'message' => 'success'
+            ];
+        } catch (ModelNotFoundException $e) {
+            return ($e->getMessage());
+
+        }
+    }
+
 }

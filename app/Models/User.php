@@ -26,7 +26,7 @@ class User extends Authenticatable
     protected $primaryKey = 'user_id';
     const UPDATED_AT = 'update_date';
     public $incrementing = false;
-    public $timestamps = true;
+    public $timestamps = false;
     protected $guarded = [
 
     ];
