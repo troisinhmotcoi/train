@@ -20,28 +20,18 @@ class DesignController extends Controller
         try {
             $params = $request->only('logo_login_ext', 'logo_login_e_ext', 'logo_header_ext', 'top_background_color', 'header_background_color');
             $op_id = array('option_id' => $request->option_id);
-            $params = $op_id + $params;
-//            dd($params);
-            if ($this->model->find($request->option_id))
-                try {
-                    $design = $this->model->find($request->option_id)->update($params);
 
-                } catch (\Exception $e) {
-                    return $e->getMessage();
-                }
-            else
-                $design = $this->model->create($params);
-//            $design = $this->model->updateOrInsert([        'option_id' => null,    ],$params);
-            return response()->json([
-                'data' => $design,
-                'status' => '200'
+            $design = $this->model->updateOrCreate($op_id, $params);
 
-            ]);
         } catch (\Exception $e) {
             return $e->getMessage();
 
         }
+        return response()->json([
+            'data' => $design,
+            'status' => '200'
 
+        ]);
 
     }
 }
