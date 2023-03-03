@@ -40,6 +40,10 @@ Route::prefix('smoothfile')
 
         Route::post('/address/update', 'AddressController@edit');
 
+        Route::post('/emailtemplate/set', 'SetEmailTemplateController@registWord');
+
+        Route::post('/design/regist','DesignController@registDesign');
+
 
     });
 Route::prefix('smoothfile')
