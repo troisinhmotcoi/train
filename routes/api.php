@@ -4,6 +4,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Models\Ldap;
 
 /*
 |--------------------------------------------------------------------------
@@ -43,6 +44,11 @@ Route::prefix('smoothfile')
         Route::post('/emailtemplate/set', 'SetEmailTemplateController@registWord');
 
         Route::post('/design/regist','DesignController@registDesign');
+
+        Route::post('/ldap/regist/','LdapController@regist');
+
+        Route::post('/ldap/delete','LdapController@delete');
+
 
 
     });
