@@ -111,26 +111,29 @@ class UserController extends Controller
 
     public function search(Request $request)
     {
-        $aData = $request->only('search[master][user_regist_date][start_eq]', 'search[master][user_regist_date][end_eq]', 'search[freeword]', 'search[master][company_id]',
-            'search[master][auth_group_id]', 'search[master][user_lock_flag]');
-        $q = $this->user;
+        $aData = $request->only('start_eq', 'end_eq', 'freeword', 'company_id',
+            'auth_group_id', 'user_lock_flag');
+        $q = $this->user->select('*');
+        foreach ($aData as $k => $v) {
+            if ($v == NULL)
+                unset($aData[$k]);
+        }
 
-        $aData = ['start_eq' => $request->search['master']['user_regist_date']['start_eq'],
-            'end_eq' => $request->search['master']['user_regist_date']['end_eq'] ?? '',
-            'auth_group_id' => $request->search['master']['auth_group_id'] ?? '',
-            'user_lock_flag' => $request->search['master']['user_lock_flag'] ?? ''
-        ];
 
         foreach ($aData as $k => $v) {
             switch ($k) {
                 case ('start_eq'):
                     $q = $q->where('user_regist_date', '>', $v);
+                // break;
                 case ('end_eq'):
                     $q = $q->where('user_regist_date', '<', $v);
+                    break;
                 default:
                     $q = $q->where($k, $v);
+                    break;
             }
         }
+
         return ['data' => $q->get(), 'count' => count($q->get())];
 
     }
@@ -143,7 +146,7 @@ class UserController extends Controller
             ])
             ->allowedSorts(['user_regist_date', 'login_code'])
             ->get();
-        return $users;
+        return count($users);
     }
 
     public function delete(Request $request)
