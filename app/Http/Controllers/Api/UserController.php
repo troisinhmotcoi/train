@@ -124,7 +124,7 @@ class UserController extends Controller
             switch ($k) {
                 case ('start_eq'):
                     $q = $q->where('user_regist_date', '>', $v);
-                // break;
+                 break;
                 case ('end_eq'):
                     $q = $q->where('user_regist_date', '<', $v);
                     break;
