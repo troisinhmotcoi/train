@@ -18,10 +18,20 @@ class AddressController extends Controller
 
         ]);
         $data = $request->only('address_book_name', 'address_book_kana', 'address_book_mail', 'note');
-        $address = Address::find($request->address_book_id);
-        foreach ($data as $k => $v) {
-            $address->$k = $v;
+        try {
+            $address = Address::findOrFail($request->address_book_id);
+            foreach ($data as $k => $v) {
+                $address->$k = $v;
+            }
+            $address->save();
+        } catch (\Exception $e) {
+            return response([
+                'message' => $e->getMessage()
+            ], 400);
         }
-        $address->save();
+        return response([
+            'message' => 'success'
+        ], 200);
     }
+
 }

@@ -27,28 +27,39 @@ class UserController extends Controller
 
     public function index(Request $request)
     {
-        if (!empty($request->user_id))
-            return User::findOrFail($request->user_id);
+        $request->validate([
+            'user_id' => 'exists:user_mst',
+            'company_type' => 'in:1,2,3'
+        ]);
+        $data = $request->only('company_type', 'user_id');
+
+
         $t = $request->company_type;
-        if (empty($t))
-            $t = 'all';
-        switch ($t) {
-            case ('all'):
-                $all = $this->user->all();
-                break;
-            default:
-                $all = DB::table('user_mst')
-                    ->join('company_mst', function (JoinClause $join) use ($t) {
-                        $join->on('user_mst.company_id', '=', 'company_mst.company_id')
-                            ->where('company_mst.company_type', '=', intval($t));
-                    })->get();
+
+        $list = $this->user->select('*');
+        try {
+            foreach ($data as $k => $v) {
+                switch ($k) {
+                    case ('company_type'):
+                        $list = $list->whereHas('company', function ($query) use ($v) {
+                            $query->where('company_type', intval($v));
+                        });
+                        break;
+                    case('user_id');
+                        $list = $list->where('user_id', $v);
+                        break;
+
+                }
+            }
+
+        } catch (\Exception $e) {
+            return response()->json($e->getMessage(), 400);
 
         }
         return response()->json([
-            'data' => $all,
-            200
-
-        ]);
+            'count' => count($list),
+            'list' => $list->get(),
+        ], 200);
 
     }
 
@@ -56,16 +67,13 @@ class UserController extends Controller
     {
         try {
             $user = $this->user->findOrFail($request->user_id);
-            $value = $request->value;
-            $user = $user->update(['user_lock_flag' => $value]);
-            $user = $this->user->findOrFail($request->user_id);
+            $request->validate(['user_lock_flag' => 'in:0,1']);
+            $user = $user->update(['user_lock_flag' => $request->user_lock_flag]);
             return response()->json([
                 'data' => $user,
-                200
-
-            ]);
+            ], 200);
         } catch (\Exception $e) {
-            return response(['message' => $e->getMessage()], 400);
+            return response($e->getMessage(), 400);
         }
     }
 
@@ -78,16 +86,12 @@ class UserController extends Controller
             $password = bcrypt($request->password);
             $user = $user->update(['user_name' => $user_name, 'user_kana' => $user_kana, 'password' => $password]);
             return response()->json([
-                'data' => $user,
-                200
-
-            ]);
+                'data' => $user
+            ],200);
         } catch (\Exception $e) {
-            return response()->json([
-                'message' => $e->getMessage(),
-                400
-
-            ]);
+            return response()->json(
+                $e->getMessage(),400
+             );
         }
 
     }
@@ -127,7 +131,7 @@ class UserController extends Controller
     {
         $aData = $request->only('start_eq', 'end_eq', 'freeword', 'company_id',
             'auth_group_id', 'user_lock_flag');
-        $q = $this->user->select('*');
+        $search = $this->user->select('*');
         foreach ($aData as $k => $v) {
             if ($v == NULL)
                 unset($aData[$k]);
@@ -137,13 +141,13 @@ class UserController extends Controller
             foreach ($aData as $k => $v) {
                 switch ($k) {
                     case ('start_eq'):
-                        $q = $q->where('user_regist_date', '>', $v);
+                        $search = $search->where('user_regist_date', '>', $v);
                         break;
                     case ('end_eq'):
-                        $q = $q->where('user_regist_date', '<', $v);
+                        $search = $search->where('user_regist_date', '<', $v);
                         break;
                     default:
-                        $q = $q->where($k, $v);
+                        $search = $search->where($k, $v);
                         break;
                 }
             }
@@ -152,7 +156,7 @@ class UserController extends Controller
             return response($e->getMessage(), 400);
         }
 
-        return response(['data' => $q->get(), 'count' => count($q->get())], 200);
+        return response(['data' => $search->get(), 'count' => count($search->get())], 200);
 
     }
 

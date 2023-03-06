@@ -58,4 +58,8 @@ class User extends Authenticatable
     {
         return $query->where('user_regist_date', '<=', Carbon::parse($date));
     }
+
+    public function company(){
+        return $this->hasOne(Company::class,'company_id','company_id');
+    }
 }
