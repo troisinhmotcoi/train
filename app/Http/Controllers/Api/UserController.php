@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
+use function PHPUnit\Framework\throwException;
 
 class UserController extends Controller
 {
@@ -26,7 +27,8 @@ class UserController extends Controller
 
     public function index(Request $request)
     {
-
+        if (!empty($request->user_id))
+            return User::findOrFail($request->user_id);
         $t = $request->company_type;
         if (empty($t))
             $t = 'all';
@@ -42,7 +44,11 @@ class UserController extends Controller
                     })->get();
 
         }
-        return $all;
+        return response()->json([
+            'data' => $all,
+            200
+
+        ]);
 
     }
 
@@ -55,11 +61,11 @@ class UserController extends Controller
             $user = $this->user->findOrFail($request->user_id);
             return response()->json([
                 'data' => $user,
-                'status' => '200'
+                200
 
             ]);
-        } catch (ModelNotFoundException $e) {
-            return ($e->getMessage());
+        } catch (\Exception $e) {
+            return response(['message' => $e->getMessage()], 400);
         }
     }
 
@@ -73,11 +79,15 @@ class UserController extends Controller
             $user = $user->update(['user_name' => $user_name, 'user_kana' => $user_kana, 'password' => $password]);
             return response()->json([
                 'data' => $user,
-                'status' => '200'
+                200
 
             ]);
-        } catch (ModelNotFoundException $e) {
-            return ($e->getMessage());
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+                400
+
+            ]);
         }
 
     }
@@ -105,8 +115,12 @@ class UserController extends Controller
             "self_approval_flag"
         );
         $data['password'] = bcrypt($data['password']);
+        try {
+            $new = DB::table('user_mst')->insert($data);
 
-        $new = DB::table('user_mst')->insert($data);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
+        }
     }
 
     public function search(Request $request)
@@ -119,22 +133,26 @@ class UserController extends Controller
                 unset($aData[$k]);
         }
 
-
-        foreach ($aData as $k => $v) {
-            switch ($k) {
-                case ('start_eq'):
-                    $q = $q->where('user_regist_date', '>', $v);
-                 break;
-                case ('end_eq'):
-                    $q = $q->where('user_regist_date', '<', $v);
-                    break;
-                default:
-                    $q = $q->where($k, $v);
-                    break;
+        try {
+            foreach ($aData as $k => $v) {
+                switch ($k) {
+                    case ('start_eq'):
+                        $q = $q->where('user_regist_date', '>', $v);
+                        break;
+                    case ('end_eq'):
+                        $q = $q->where('user_regist_date', '<', $v);
+                        break;
+                    default:
+                        $q = $q->where($k, $v);
+                        break;
+                }
             }
+
+        } catch (\Exception $e) {
+            return response($e->getMessage(), 400);
         }
 
-        return ['data' => $q->get(), 'count' => count($q->get())];
+        return response(['data' => $q->get(), 'count' => count($q->get())], 200);
 
     }
 
@@ -146,7 +164,7 @@ class UserController extends Controller
             ])
             ->allowedSorts(['user_regist_date', 'login_code'])
             ->get();
-        return count($users);
+        return response(['data' => $users, 'count' => count($users)], 200);
     }
 
     public function delete(Request $request)
@@ -155,32 +173,31 @@ class UserController extends Controller
             $user = User::findOrFail($request->user_id);
             $user->delete();
         } // catch(Exception $e) catch any exception
-        catch (ModelNotFoundException $e) {
-            return ($e->getMessage());
+        catch (\Exception $e) {
+            return response($e->getMessage(), 400);
         }
+        return response(['data' => $user], 200);
+
     }
 
     public function changePassword(Request $request)
     {
 
         try {
-            $user = $this->user->findOrFail($request->user_id);
+            $user = User::findOrFail($request->user_id);
             $check = password_verify($request->current_pw, $user->password);
             if ($check) {
                 $password = bcrypt($request->expect_pw);
                 $user = $user->update(['password' => $password]);
-                if ($user)
-                    return response()->json([
-                        'data' => $user,
-                        'status' => '200'
 
-                    ]);
-            }
+            } else
+                throw new \Exception('current password is incorrect');
 
-        } catch (ModelNotFoundException $e) {
-            return ($e->getMessage());
+        } catch (\Exception $e) {
+            return response(['messagezs' => $e->getMessage()], 400);
+
         }
-
+        return response(['data' => $user], 200);
 
     }
 

@@ -25,30 +25,49 @@ Route::prefix('smoothfile')
     ->namespace('App\Http\Controllers\Api')
     ->middleware('auth:sanctum')
     ->group(function () {
-        Route::post('/user', 'UserController@index');
-        Route::post('/user-create', 'UserController@create');
-        Route::post('/user-update', 'UserController@update');
-        Route::post('/user-delete', 'UserController@delete');
-        Route::post('/user-search', 'UserController@libSearch');
+//route::resource('user', 'UserController');
+        Route::prefix('user')
+            ->group(function () {
+                Route::get('/', 'UserController@index');
+                Route::post('/create', 'UserController@create');
+                Route::patch('/update', 'UserController@update');
+                Route::patch('/change-lock', 'UserController@changeLock');
+                Route::patch('/option/password', 'UserController@changePassword');
 
-        Route::get('/files/export/', 'FileController@export');
-        Route::post('/files/import/', 'FileController@import');
-        Route::post('/files/export/detail', 'FileController@exportDetailExcel');
+                Route::delete('/delete', 'UserController@delete');
+                Route::get('/search', 'UserController@libSearch');
+                Route::get('/search-manual', 'UserController@search');
 
-        Route::post('/option/password', 'UserController@changePassword');
+                Route::get('/export', 'FileController@export');
+                Route::get('export/detail', 'FileController@exportDetailExcel');
+                Route::post('import', 'FileController@import');
+            });
 
-        Route::post('/user/change-lock', 'UserController@changeLock');
 
-        Route::post('/address/update', 'AddressController@edit');
+        Route::prefix('address')
+            ->group(function () {
+                Route::patch('/update', 'AddressController@edit');
+
+            }
+            );
+
+        Route::prefix('design')
+            ->group(function () {
+                Route::post('/regist', 'DesignController@registDesign');
+
+            }
+            );
+
+        Route::prefix('ldap')
+            ->group(function () {
+                Route::post('/regist', 'LdapController@regist');
+                Route::delete('/delete', 'LdapController@delete');
+
+            }
+            );
+
 
         Route::post('/emailtemplate/set', 'SetEmailTemplateController@registWord');
-
-        Route::post('/design/regist','DesignController@registDesign');
-
-        Route::post('/ldap/regist/','LdapController@regist');
-
-        Route::post('/ldap/delete','LdapController@delete');
-
 
 
     });
