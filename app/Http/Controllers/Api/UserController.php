@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\Paginate;
 use App\Http\Requests\UserNonCreateRequest;
 use App\Http\Requests\UserRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -57,8 +58,7 @@ class UserController extends BaseController
 
         }
         return response()->json([
-            'count' => count($list),
-            'list' => $list->get(),
+            'list' => $list->paginate(Paginate::user),
         ], 200);
 
     }
@@ -154,7 +154,7 @@ class UserController extends BaseController
             return $this->responseFail($e->getMessage());
         }
 
-        return response(['data' => $search->get(), 'count' => count($search->get())], 200);
+        return response(['data' => $search->paginate(Paginate::user)], 200);
 
     }
 
@@ -165,7 +165,7 @@ class UserController extends BaseController
                 ->allowedFilters([AllowedFilter::scope('start_eq'), AllowedFilter::scope('end_eq'), 'login_code'
                 ])
                 ->allowedSorts(['user_regist_date', 'login_code'])
-                ->get();
+                ->paginate(Paginate::user);
         } catch (\Exception $e) {
             return $this->responseFail($e->getMessage());
         }
