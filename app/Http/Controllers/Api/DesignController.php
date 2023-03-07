@@ -8,11 +8,11 @@ use App\Models\Design;
 use http\Exception;
 use Illuminate\Http\Request;
 
-class DesignController extends Controller
+class DesignController extends BaseController
 {
     public function __construct(Design $design)
     {
-        $this->model = $design;
+        parent::__construct($design);
     }
 
     public function registDesign(DesignRequest $request)
@@ -24,14 +24,12 @@ class DesignController extends Controller
             $design = $this->model->updateOrCreate($op_id, $params);
 
         } catch (\Exception $e) {
-            return $e->getMessage();
+          return  $this->responseFail($e->getMessage());
+
 
         }
-        return response()->json([
-            'data' => $design,
-            'status' => '200'
+        return $this->responseSuccess($design);
 
-        ]);
 
     }
 }

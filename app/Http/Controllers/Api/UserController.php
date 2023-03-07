@@ -17,13 +17,12 @@ use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use function PHPUnit\Framework\throwException;
 
-class UserController extends Controller
+class UserController extends BaseController
 {
-    private $user;
 
     public function __construct(User $user)
     {
-        $this->user = $user;
+        parent::__construct($user);
     }
 
     public function index(Request $request)
@@ -37,7 +36,7 @@ class UserController extends Controller
             if ($v == NULL)
                 unset($data[$k]);
         }
-        $list = $this->user->select('*');
+        $list = $this->model->select('*');
         try {
             foreach ($data as $k => $v) {
                 switch ($k) {
@@ -54,7 +53,7 @@ class UserController extends Controller
             }
 
         } catch (\Exception $e) {
-            return response()->json($e->getMessage(), 400);
+            return $this->responseFail($e->getMessage());
 
         }
         return response()->json([
@@ -67,34 +66,30 @@ class UserController extends Controller
     public function changeLock(Request $request)
     {
         try {
-            $user = $this->user->findOrFail($request->user_id);
+            $user = $this->model->findOrFail($request->user_id);
             $request->validate(['user_lock_flag' => 'in:0,1']);
             $user = $user->update(['user_lock_flag' => $request->user_lock_flag]);
-            return response()->json([
-                'data' => $user,
-            ], 200);
+            return $this->responseSuccess($user);
+
         } catch (\Exception $e) {
-            return response($e->getMessage(), 400);
+            return $this->responseFail($e->getMessage());
         }
     }
 
     public function update(Request $request)
     {
         try {
-            $user = $this->user->findOrFail($request->user_id);
+            $user = $this->model->findOrFail($request->user_id);
             $user_name = $request->user_name;
             $user_kana = $request->user_kana;
             $password = bcrypt($request->password);
             $user = $user->update(['user_name' => $user_name, 'user_kana' => $user_kana, 'password' => $password]);
-            return response()->json([
-                'data' => $user
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json(
-                $e->getMessage(), 400
-            );
-        }
+            return $this->responseSuccess($user);
 
+        } catch (\Exception $e) {
+            return $this->responseFail($e->getMessage());
+
+        }
     }
 
     public function create(UserRequest $request)
@@ -121,18 +116,20 @@ class UserController extends Controller
         );
         $data['password'] = bcrypt($data['password']);
         try {
-            $new = DB::table('user_mst')->insert($data);
+            $new = $this->model->create($data);
 
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 400);
+            return $this->responseFail($e->getMessage());
         }
+        return $this->responseSuccess($new);
+
     }
 
     public function search(UserNonCreateRequest $request)
     {
         $aData = $request->only('start_eq', 'end_eq', 'freeword', 'company_id',
             'auth_group_id', 'user_lock_flag');
-        $search = $this->user->select('*');
+        $search = $this->model->select('*');
         foreach ($aData as $k => $v) {
             if ($v == NULL)
                 unset($aData[$k]);
@@ -154,7 +151,7 @@ class UserController extends Controller
             }
 
         } catch (\Exception $e) {
-            return response($e->getMessage(), 400);
+            return $this->responseFail($e->getMessage());
         }
 
         return response(['data' => $search->get(), 'count' => count($search->get())], 200);
@@ -170,7 +167,7 @@ class UserController extends Controller
                 ->allowedSorts(['user_regist_date', 'login_code'])
                 ->get();
         } catch (\Exception $e) {
-            return response()->json($e->getMessage(), 400);
+            return $this->responseFail($e->getMessage());
         }
 
         return response(['data' => $users, 'count' => count($users)], 200);
@@ -183,9 +180,9 @@ class UserController extends Controller
             $user->delete();
         } // catch(Exception $e) catch any exception
         catch (\Exception $e) {
-            return response($e->getMessage(), 400);
+            return $this->responseFail($e->getMessage());
         }
-        return response(['data' => $user], 200);
+        return $this->responseSuccess($user);
 
     }
 
@@ -203,10 +200,10 @@ class UserController extends Controller
                 throw new \Exception('current password is incorrect');
 
         } catch (\Exception $e) {
-            return response(['messagezs' => $e->getMessage()], 400);
+            return $this->responseFail($e->getMessage());
 
         }
-        return response(['data' => $user], 200);
+        return $this->responseSuccess($user);
 
     }
 

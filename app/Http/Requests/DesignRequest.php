@@ -43,7 +43,7 @@ class DesignRequest extends FormRequest
 
             'data' => $validator->errors()
 
-        ]));
+        ],422));
 
     }
 

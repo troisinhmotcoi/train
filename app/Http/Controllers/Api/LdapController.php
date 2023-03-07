@@ -7,13 +7,13 @@ use App\Http\Requests\ChangeLdapRequest;
 use App\Models\Ldap;
 use Illuminate\Http\Request;
 
-class LdapController extends Controller
+class LdapController extends BaseController
 {
-    private $model;
 
     public function __construct(Ldap $ldap)
     {
-        $this->model = $ldap;
+        parent::__construct($ldap);
+
     }
 
     public function regist(Request $request)
@@ -25,25 +25,23 @@ class LdapController extends Controller
             $ldap = $this->model->updateOrCreate($ldap_id, $params);
 
         } catch (\Exception $e) {
-            return $e->getMessage();
+            $this->responseFail($e->getMessage());
 
         }
-        return response()->json([
-            'data' => $ldap,
-            'status' => '200'
+        return $this->responseSuccess($ldap);
 
-        ]);
     }
 
     public function delete(ChangeLdapRequest $request)
     {
         try {
-            return $this->model->find($request->ldap_id)->delete();
-
+            $del = $this->model->findOrFail($request->ldap_id);
+            $del->delete();
         } catch (\Exception $e) {
-            return $e->getMessage();
+            return $this->responseFail($e->getMessage());
 
         }
+        return $this->responseSuccess();
 
     }
 
@@ -52,7 +50,10 @@ class LdapController extends Controller
         try {
             $this->model->whereIn('ldap_id', $ids)->get()->delete();
         } catch (\Exception $e) {
-            return $e->getMessage();
+            $this->responseFail($e->getMessage());
         }
+
+        return $this->responseSuccess();
+
     }
 }
