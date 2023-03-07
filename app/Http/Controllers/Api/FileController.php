@@ -30,11 +30,9 @@ class FileController extends Controller
     {
         try {
             Excel::import(new FileImport, request()->file('data'));
-            return [
-                'message' => 'success'
-            ];
-        } catch (ModelNotFoundException $e) {
-            return ($e->getMessage());
+            return response()->json('success',200);
+        } catch (\Exception $e) {
+            return response()->json($e->getMessage(),400);
 
         }
     }

@@ -165,36 +165,34 @@ class SetEmailTemplateController extends Controller
         $this->language_id = $request->language_id;
     }
 
-    public function registWord(Request $request)
+    public function updateWord(Request $request)
     {
         $param = $request->only($this->word_id_array);
-        //文言の登録
         if (empty($param) || empty($this->language_id))
-            return 'invalid';
+            self::$error_flg = true;
         DB::connection('pgsql')->beginTransaction();
-        foreach ($param as $key => $value) {
-            try {
-
+        try {
+            foreach ($param as $key => $value) {
                 $q = $this->model->where("editable_word_id", $key)->where('language_id', $this->language_id);
                 if (empty($q->first())) {
-                    self::$error_flg = true;
+                    throw new \Exception('no result for query');
                 } else
                     $this->model->where("editable_word_id", $key)->where('language_id', $this->language_id)
                         ->update(['editable_word' => $value]);
-            } catch (\Exception $e) {
-                DB::rollBack();
-                return $e->getMessage();
             }
-
-
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['fail' => $e->getMessage()], 400);
         }
+
+
         if ($this->isError()) {
             DB::rollBack();
-            return 'fail';
+            return response()->json('fail', 400);
 
         } else {
             DB::connection('pgsql')->commit();
-            return 'success';
+            return response()->json('success', 200);
         }
 
 

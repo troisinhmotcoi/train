@@ -67,7 +67,7 @@ Route::prefix('smoothfile')
             );
 
 
-        Route::post('/emailtemplate/set', 'SetEmailTemplateController@registWord');
+        Route::post('/emailtemplate/update', 'SetEmailTemplateController@updateWord');
 
 
     });
