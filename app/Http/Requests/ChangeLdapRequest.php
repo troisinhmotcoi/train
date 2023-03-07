@@ -19,7 +19,7 @@ class ChangeLdapRequest extends FormRequest
     {
 
         return [
-            'ldap_id' => ['required',
+            'ldap_id' => [
                 'exists:ldap_mst,ldap_id',
             ],
             'ids.*' => 'exists:ldap_mst,ldap_id'

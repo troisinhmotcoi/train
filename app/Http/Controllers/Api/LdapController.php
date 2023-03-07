@@ -45,10 +45,10 @@ class LdapController extends BaseController
 
     }
 
-    public function deleteMulti($ids)
+    public function deleteMulti(ChangeLdapRequest $request)
     {
         try {
-            $this->model->whereIn('ldap_id', $ids)->get()->delete();
+            $this->model->whereIn('ldap_id', $request->ids)->delete();
         } catch (\Exception $e) {
             $this->responseFail($e->getMessage());
         }
