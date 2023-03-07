@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Requests\UserNonCreateRequest;
 use App\Http\Requests\UserRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Query\JoinClause;
@@ -32,10 +33,10 @@ class UserController extends Controller
             'company_type' => 'in:1,2,3'
         ]);
         $data = $request->only('company_type', 'user_id');
-
-
-        $t = $request->company_type;
-
+        foreach ($data as $k => $v) {
+            if ($v == NULL)
+                unset($data[$k]);
+        }
         $list = $this->user->select('*');
         try {
             foreach ($data as $k => $v) {
@@ -87,11 +88,11 @@ class UserController extends Controller
             $user = $user->update(['user_name' => $user_name, 'user_kana' => $user_kana, 'password' => $password]);
             return response()->json([
                 'data' => $user
-            ],200);
+            ], 200);
         } catch (\Exception $e) {
             return response()->json(
-                $e->getMessage(),400
-             );
+                $e->getMessage(), 400
+            );
         }
 
     }
@@ -127,7 +128,7 @@ class UserController extends Controller
         }
     }
 
-    public function search(Request $request)
+    public function search(UserNonCreateRequest $request)
     {
         $aData = $request->only('start_eq', 'end_eq', 'freeword', 'company_id',
             'auth_group_id', 'user_lock_flag');
@@ -160,14 +161,18 @@ class UserController extends Controller
 
     }
 
-    public function libSearch(Request $request)
+    public function libSearch(UserNonCreateRequest $request)
     {
+        try {
+            $users = QueryBuilder::for(User::class)
+                ->allowedFilters([AllowedFilter::scope('start_eq'), AllowedFilter::scope('end_eq'), 'login_code'
+                ])
+                ->allowedSorts(['user_regist_date', 'login_code'])
+                ->get();
+        } catch (\Exception $e) {
+            return response()->json($e->getMessage(), 400);
+        }
 
-        $users = QueryBuilder::for(User::class)
-            ->allowedFilters([AllowedFilter::scope('start_eq'), AllowedFilter::scope('end_eq'), 'login_code'
-            ])
-            ->allowedSorts(['user_regist_date', 'login_code'])
-            ->get();
         return response(['data' => $users, 'count' => count($users)], 200);
     }
 
