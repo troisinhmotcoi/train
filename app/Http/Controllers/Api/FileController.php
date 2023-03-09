@@ -20,9 +20,15 @@ class FileController extends Controller
 
     public function exportDetailExcel(Request $request)
     {
-        $user = User::findOrFail($request->user_id);
-        return Excel::download(new FileExport($user->user_id), $user->login_code . '.xlsx');
-        return Excel::store(new FileExport($user->user_id), $user->login_code . '.xlsx', 'disk-name'); //lưu file export trên ổ cứng
+        try {
+            $this->validate($request, ['user_id' => 'required|exists:user_mst,user_id']);
+
+            $user = User::findOrFail($request->user_id);
+            return Excel::download(new FileExport($user->user_id), $user->login_code . '.xlsx');
+            return Excel::store(new FileExport($user->user_id), $user->login_code . '.xlsx', 'disk-name'); //lưu file export trên ổ cứng
+        } catch (\Exception $e) {
+            return response()->json(['fail' => $e->getMessage()], 404);
+        }
 
     }
 
@@ -30,9 +36,9 @@ class FileController extends Controller
     {
         try {
             Excel::import(new FileImport, request()->file('data'));
-            return response()->json('success',200);
+            return response()->json('success', 200);
         } catch (\Exception $e) {
-            return response()->json($e->getMessage(),400);
+            return response()->json($e->getMessage(), 400);
 
         }
     }
