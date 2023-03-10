@@ -80,16 +80,22 @@ class UserController extends BaseController
     {
         try {
             $user = $this->model->findOrFail($request->user_id);
-            $user_name = $request->user_name;
-            $user_kana = $request->user_kana;
-            $password = bcrypt($request->password);
-            $user = $user->update(['user_name' => $user_name, 'user_kana' => $user_kana, 'password' => $password]);
-            return $this->responseSuccess($user);
-
+            $params = $request->only('user_name', 'user_kana', 'password');
+            foreach ($params as $k => $v) {
+                if ($v == NULL)
+                    unset($params[$k]);
+            };
+            if (array_key_exists('password', $params))
+                $params['password'] = bcrypt($params['password']);
+            if (count($params) > 0)
+                $user = $user->update($params);
+          
         } catch (\Exception $e) {
             return $this->responseFail($e->getMessage());
 
         }
+        return $this->responseSuccess($user);
+
     }
 
     public function create(UserRequest $request)
