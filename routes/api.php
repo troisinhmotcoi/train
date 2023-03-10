@@ -63,8 +63,6 @@ Route::prefix('smoothfile')
                 Route::post('/regist', 'LdapController@regist');
                 Route::delete('/delete', 'LdapController@delete');
                 Route::delete('/delete/multi', 'LdapController@deleteMulti');
-
-
             }
             );
 

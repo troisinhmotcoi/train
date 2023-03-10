@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -17,16 +16,15 @@ class DatabaseSeeder extends Seeder
 //         \App\Models\User::factory(1)->create();
 
          \App\Models\User::factory()->create([
-//             "user_id" => "00000001",
-//             "company_id" => "0002",
+             "company_id" => "0002",
              "section_id" => null,
-             "user_name" => "Administrator",
-             "user_kana" => "Administrator",
+             "user_name" => "test",
+             "user_kana" => "test",
              "user_mail" => "m-truong2@test41.com",
              "user_sub_mail" => null,
              "language_id" => "01",
-             "login_code" => "admin",
-             "password" => bcrypt('plottcpn'),
+             "login_code" => "test",
+             "password" => bcrypt('lovecat'),
              "auth_group_id" => "001",
              "approval_user_flag" => 1,
              "approval_method" => 4,

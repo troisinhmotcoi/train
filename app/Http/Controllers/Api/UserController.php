@@ -178,8 +178,7 @@ class UserController extends BaseController
         try {
             $user = User::findOrFail($request->user_id);
             $user->delete();
-        } // catch(Exception $e) catch any exception
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             return $this->responseFail($e->getMessage());
         }
         return $this->responseSuccess($user);
