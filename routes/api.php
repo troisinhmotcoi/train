@@ -74,6 +74,6 @@ Route::prefix('smoothfile')
 Route::prefix('smoothfile')
     ->namespace('App\Http\Controllers\Auth')
     ->group(function () {
-
         Route::post('/sanctum/token', 'LoginController@get_token');
+        Route::post('/register', 'RegisterController@register');
     });

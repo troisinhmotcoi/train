@@ -134,7 +134,7 @@ class UserController extends BaseController
     public function search(UserNonCreateRequest $request)
     {
         $aData = $request->only('start_eq', 'end_eq', 'freeword', 'company_id',
-            'auth_group_id', 'user_lock_flag');
+            'auth_group_id', 'user_lock_flag', 'login_code');
         $search = $this->model->select('*');
         foreach ($aData as $k => $v) {
             if ($v == NULL)
@@ -167,8 +167,11 @@ class UserController extends BaseController
         } catch (\Exception $e) {
             return $this->responseFail($e->getMessage());
         }
-
-        return response(['data' => $search->paginate(Paginate::user)], 200);
+        $result = $search
+            ->orderBy('user_name')
+            ->orderBy('login_code')
+            ->paginate(Paginate::user);
+        return response(['data' => $result], 200);
 
     }
 

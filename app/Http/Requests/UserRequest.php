@@ -19,11 +19,13 @@ class UserRequest extends FormRequest
 
         return [
             'user_name' => 'required',
+            'user_mail' => 'required|email',
             'company_id' => 'required|digits:4',
             'auth_group_id' => 'required|digits:3',
             'password_change_date' => 'date',
-            'login_code' => 'unique:user_mst'
-
+            'login_code' => 'required|unique:user_mst',
+            'password' => 'required',
+            'c_password' => 'required|same:password'
 
 
         ];
@@ -37,24 +39,13 @@ class UserRequest extends FormRequest
 
         throw new HttpResponseException(response()->json([
 
-            'success' => false,
-
             'message' => 'Validation errors',
 
             'data' => $validator->errors()
 
-        ]));
+        ], 422));
 
     }
 
-
-
-//    public function messages()
-//
-//    {
-//
-//
-//
-//    }
 
 }

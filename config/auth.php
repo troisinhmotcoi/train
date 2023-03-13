@@ -41,7 +41,7 @@ return [
             'provider' => 'users',
         ],
         'api' => [
-            'driver' => 'api',
+            'driver' => 'token',
             'provider' => 'users',
             'hash' => false,
         ],
@@ -70,10 +70,6 @@ return [
             'model' => App\Models\User::class,
         ],
 
-         'api' => [
-             'driver' => 'database',
-             'table' => 'personal_access_tokens',
-         ],
     ],
 
     /*
