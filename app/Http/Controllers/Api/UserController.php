@@ -89,7 +89,7 @@ class UserController extends BaseController
                 $params['password'] = bcrypt($params['password']);
             if (count($params) > 0)
                 $user = $user->update($params);
-          
+
         } catch (\Exception $e) {
             return $this->responseFail($e->getMessage());
 
@@ -140,7 +140,6 @@ class UserController extends BaseController
             if ($v == NULL)
                 unset($aData[$k]);
         }
-
         try {
             foreach ($aData as $k => $v) {
                 switch ($k) {
@@ -149,6 +148,15 @@ class UserController extends BaseController
                         break;
                     case ('end_eq'):
                         $search = $search->where('user_regist_date', '<', $v);
+                        break;
+                    case ('freeword'):
+                        $search = $search->Where(function ($query) use ($v) {
+                            $query->orwhere('user_name', 'like', '%' . $v . '%')
+                                ->orWhere('user_kana', 'like', '%' . $v . '%')
+                                ->orWhere('user_mail', 'like', '%' . $v . '%')
+                                ->orWhere('user_sub_mail', 'like', '%' . $v . '%')
+                                ->orWhere('login_code', 'like', '%' . $v . '%');
+                        });
                         break;
                     default:
                         $search = $search->where($k, $v);
