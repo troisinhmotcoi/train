@@ -70,16 +70,18 @@ class LoginController extends Controller
         $credentials = $request->getCredentials();
 
         $authenticated = Auth::attempt($credentials);
-
         if ($authenticated) {
             $user = Auth::getProvider()->retrieveByCredentials($credentials);
+            if($user->id_lock_flag == 0){
+                $token = $user->createToken($request->login_code)->plainTextToken;
+                return response()->json(
+                    [
+                        'access_token' => $token
+                    ], 200
+                );
+            } else
+                return response()->json("The applicable User is locked. You cannot log in.");
 
-            $token = $user->createToken($request->login_code)->plainTextToken;
-            return response()->json(
-                [
-                    'access_token' => $token
-                ], 200
-            );
         } else
             return 'not authenticated';
 

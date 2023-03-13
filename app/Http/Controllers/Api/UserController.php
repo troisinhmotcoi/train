@@ -63,20 +63,7 @@ class UserController extends BaseController
 
     }
 
-    public function changeLock(Request $request)
-    {
-        try {
-            $user = $this->model->findOrFail($request->user_id);
-            $request->validate(['user_lock_flag' => 'in:0,1']);
-            $user = $user->update(['user_lock_flag' => $request->user_lock_flag]);
-            return $this->responseSuccess($user);
-
-        } catch (\Exception $e) {
-            return $this->responseFail($e->getMessage());
-        }
-    }
-
-    public function update(Request $request)
+    public function update(UserNonCreateRequest $request)
     {
         try {
             $user = $this->model->findOrFail($request->user_id);
@@ -202,10 +189,10 @@ class UserController extends BaseController
 
     }
 
-    public function changePassword(UserNonCreateRequest $request)
+    public function changePassword(Request $request)
     {
         try {
-            $this->validate($request, ['current_pw' => 'required', 'expect_pw' => 'required|different:current_pw']);
+            $this->validate($request, ['current_pw' => 'required', 'expect_pw' => 'required|different:current_pw', 'user_id' => 'required|exists:user_mst,user_id']);
             $user = User::findOrFail($request->user_id);
             $check = password_verify($request->current_pw, $user->password);
             if ($check) {
@@ -221,6 +208,21 @@ class UserController extends BaseController
         }
         return $this->responseSuccess($user);
 
+    }
+
+    public function loginRestrict(Request $request)
+    {
+        try {
+            $this->validate($request, ['id_lock_flag' => 'required|in:0,1', 'user_id' => 'required|exists:user_mst,user_id']);
+            $user = User::findOrFail($request->user_id);
+            $value = $request->id_lock_flag;
+            $user->update(['id_lock_flag' => $value]);
+
+        } catch (\Exception $exception) {
+            return $this->responseFail($exception->getMessage());
+
+        }
+        return $this->responseSuccess();
     }
 
 

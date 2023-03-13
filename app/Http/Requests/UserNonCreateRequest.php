@@ -22,7 +22,8 @@ class UserNonCreateRequest extends FormRequest
             'end_eq' => 'date',
             'login_code' => 'exists:user_mst,login_code',
             'user_regist_date' => 'date',
-            'user_id' => 'exists:user_mst,user_id'
+            'user_id' => 'exists:user_mst,user_id',
+            'password_re' => 'same:password'
 
         ];
 

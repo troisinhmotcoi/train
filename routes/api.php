@@ -31,8 +31,9 @@ Route::prefix('smoothfile')
                 Route::get('/', 'UserController@index');
                 Route::post('/create', 'UserController@create');
                 Route::patch('/update', 'UserController@update');
-                Route::patch('/change-lock', 'UserController@changeLock');
                 Route::patch('/option/password', 'UserController@changePassword');
+                Route::patch('/login-restrict', 'UserController@loginRestrict');
+
 
                 Route::delete('/delete', 'UserController@delete');
                 Route::get('/search', 'UserController@libSearch');
