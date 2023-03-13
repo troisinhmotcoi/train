@@ -67,13 +67,13 @@ class UserController extends BaseController
     {
         try {
             $user = $this->model->findOrFail($request->user_id);
-            $params = $request->only('user_name', 'user_kana', 'password');
+            $params = $request->only('user_name', 'user_kana','user_mail', 'language_id','auth_group_id','approval_user_flag','approval_method','file_share_approval_flag',
+            'ip_restriction_use_flag');
             foreach ($params as $k => $v) {
                 if ($v == NULL)
                     unset($params[$k]);
             };
-            if (array_key_exists('password', $params))
-                $params['password'] = bcrypt($params['password']);
+
             if (count($params) > 0)
                 $user = $user->update($params);
 
