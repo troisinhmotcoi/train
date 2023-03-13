@@ -202,10 +202,10 @@ class UserController extends BaseController
 
     }
 
-    public function changePassword(Request $request)
+    public function changePassword(UserNonCreateRequest $request)
     {
-
         try {
+            $this->validate($request, ['current_pw' => 'required', 'expect_pw' => 'required|different:current_pw']);
             $user = User::findOrFail($request->user_id);
             $check = password_verify($request->current_pw, $user->password);
             if ($check) {

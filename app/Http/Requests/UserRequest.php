@@ -24,9 +24,7 @@ class UserRequest extends FormRequest
             'auth_group_id' => 'required|digits:3',
             'password_change_date' => 'date',
             'login_code' => 'required|unique:user_mst',
-            'password' => 'required',
-            'c_password' => 'required|same:password'
-
+            'password' => 'required|confirmed'
 
         ];
 
